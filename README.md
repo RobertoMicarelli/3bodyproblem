@@ -2,7 +2,7 @@
 
 Un'esplorazione interattiva e didattica della danza gravitazionale tra corpi celesti. Questa applicazione web permette di simulare il comportamento di sistemi a N-corpi, dal semplice sistema Terra-Sole a configurazioni personalizzate e interattive.
 
-![Menu](main/menu.png)
+![Menu](./menu.png)
 
 ## Funzionalità Principali
 
@@ -34,7 +34,7 @@ Non sono necessarie dipendenze o server web, l'applicazione funziona direttament
     *   **LANCIA NUOVO CORPO**: Lancia un nuovo corpo nel sistema con massa e velocità dinamiche.
     *   **AGGIUNGI CORPO (MOUSE)**: Abilita/disabilita la modalità per aggiungere corpi cliccando sul canvas.
 
- ![Menu](main/schermata.png)
+ ![Menu](./schermata.png)
 
 ## Crediti
 
