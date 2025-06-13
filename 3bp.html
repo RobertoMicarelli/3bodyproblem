@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Problema dei 3 Corpi v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .menu-button {
+            transition: all 0.3s ease;
+        }
+        .menu-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Schermata del Menu Principale -->
+    <div id="menu-view" class="h-screen w-screen flex flex-col items-center justify-center p-4">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold text-cyan-300">Il Problema degli N-Corpi</h1>
+            <p class="text-lg md:text-xl text-gray-300 mt-4">Un'esplorazione interattiva della danza gravitazionale</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+            <button onclick="showSection('didattica')" class="menu-button col-span-1 md:col-span-3 text-lg font-semibold p-6 rounded-xl bg-indigo-600 hover:bg-indigo-500">
+                🚀 Inizia da qui: La Spiegazione
+            </button>
+            <button onclick="startSimulation('terra-sole')" class="menu-button font-semibold p-6 rounded-xl bg-yellow-600 hover:bg-yellow-500">Terra & Sole</button>
+            <button onclick="startSimulation('terra-luna-sole')" class="menu-button font-semibold p-6 rounded-xl bg-blue-600 hover:bg-blue-500">Terra, Luna & Sole</button>
+            <button onclick="startSimulation('sistema-solare')" class="menu-button font-semibold p-6 rounded-xl bg-red-600 hover:bg-red-500">Sistema Solare</button>
+            <button onclick="startInteractiveSimulation()" class="menu-button font-semibold p-6 rounded-xl bg-purple-600 hover:bg-purple-500 col-span-1 md:col-span-3">Simulazione Interattiva</button>
+            <div class="col-span-1 md:col-span-3 glass-panel rounded-xl p-4 flex flex-col md:flex-row items-center justify-center gap-4">
+                 <label for="body-count" class="font-semibold">Oppure crea il tuo universo:</label>
+                 <select id="body-count" class="bg-gray-700 text-white rounded-md p-2">
+                    <option value="3">3 Corpi</option>
+                    <option value="4">4 Corpi</option>
+                    <option value="5">5 Corpi</option>
+                    <option value="10">10 Corpi</option>
+                    <option value="20">20 Corpi</option>
+                 </select>
+                 <button onclick="startCustomSimulation()" class="w-full md:w-auto font-semibold px-6 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-gray-900">Avvia Simulazione</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sezione Didattica -->
+    <div id="didattica-view" class="hidden h-screen w-screen overflow-y-auto p-8 md:p-12">
+        <div id="spiegazione-base">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 mb-6">Un Ballo Cosmico a Due (che funziona sempre)</h2>
+            <p class="text-lg text-gray-300 mb-8 max-w-3xl">
+                Immagina una coppia di ballerini in una sala vuota. Se conosci la loro posizione e come si muovono all'inizio, puoi prevedere esattamente ogni loro passo futuro. Sarà una danza elegante e prevedibile, un'orbita perfetta. Questo è il **problema dei due corpi**: un pianeta attorno a una stella, come la Terra e il Sole. Le leggi di Newton ci danno una formula esatta per descrivere il loro moto per sempre. Semplice e bellissimo.
+            </p>
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 mb-6">Il Guastafeste: l'arrivo del Terzo Corpo</h2>
+            <p class="text-lg text-gray-300 mb-8 max-w-3xl">
+                Ora, immagina che un terzo ballerino entri in pista. La situazione cambia completamente. Non appena entra, le coppie si rompono, le traiettorie diventano imprevedibili. Chi ballerà con chi? Dove finiranno? Questo è il **problema dei tre corpi**.
+                <br><br>
+                Aggiungere anche solo un corpo in più rende il sistema **caotico**. Non esiste più una formula magica per prevedere il futuro. Una piccolissima spinta a uno dei corpi all'inizio può portare a un futuro completamente diverso: magari uno viene scagliato via nello spazio, o due si scontrano!
+                <br><br>
+                Questa "sensibilità alle condizioni iniziali" è il cuore della **teoria del caos**. Ecco perché per studiare questi sistemi non usiamo formule, ma simulazioni al computer come quella che stai per provare.
+            </p>
+            <button onclick="toggleDetails(true)" class="mt-4 font-semibold px-8 py-3 rounded-xl bg-green-600 hover:bg-green-500">
+                Approfondisci &rarr;
+            </button>
+        </div>
+
+        <div id="approfondimento-view" class="hidden">
+            <h2 class="text-3xl md:text-4xl font-bold text-cyan-300 mb-6">Oltre il Caos: Isole di Stabilità</h2>
+            <p class="text-lg text-gray-300 mb-8 max-w-3xl">
+                Anche se la maggior parte delle soluzioni a 3 corpi è caotica, esistono delle eccezioni! Il matematico Lagrange scoprì cinque punti speciali in un sistema a due corpi (come Terra-Sole), dove un terzo corpo di massa trascurabile può rimanere in un'orbita stabile. Questi **Punti di Lagrange** (L1-L5) sono come oasi di calma nel caos gravitazionale.
+                <br><br>
+                Oggi li usiamo per posizionare telescopi spaziali (come il James Webb Space Telescope in L2) e satelliti, perché richiedono pochissimo carburante per mantenere la loro posizione. Quindi, anche nel caos, la fisica a volte ci regala un po' di ordine.
+            </p>
+            
+            <h3 class="text-2xl font-bold text-cyan-300 mb-4">Video Consigliati</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+                 <div>
+                    <h4 class="font-semibold mb-2">Cos'è e perché è (quasi) impossibile risolverlo (Geopop)</h4>
+                    <div class="video-container rounded-lg overflow-hidden"><iframe src="https://www.youtube.com/embed/SfKv0lnhrc4" allowfullscreen></iframe></div>
+                </div>
+                 <div>
+                    <h4 class="font-semibold mb-2">Il Problema dei Tre Corpi e le Orbite Caotiche (Chi ha paura del buio?)</h4>
+                    <div class="video-container rounded-lg overflow-hidden"><iframe src="https://www.youtube.com/embed/MAmkSBnomkE" allowfullscreen></iframe></div>
+                </div>
+            </div>
+
+            <button onclick="toggleDetails(false)" class="mt-12 font-semibold px-8 py-3 rounded-xl bg-gray-600 hover:bg-gray-500">
+                &larr; Torna alla spiegazione base
+            </button>
+        </div>
+
+        <button onclick="showSection('menu')" class="mt-8 font-semibold px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500">
+            &larr; Torna al Menu Principale
+        </button>
+    </div>
+
+    <!-- Sezione Simulazione -->
+    <div id="simulazione-view" class="hidden h-screen w-screen relative">
+        <canvas id="simulation-canvas"></canvas>
+        <div class="absolute top-4 left-4 glass-panel p-3 rounded-xl flex flex-col gap-3">
+            <button onclick="stopSimulationAndShowMenu()" title="Torna al menu" class="font-semibold px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500">&larr; Menu</button>
+            <button onclick="restartCurrentSimulation()" title="Riavvia simulazione" class="font-semibold px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-gray-900">Riavvia</button>
+            <button id="launch-new-body-button" onclick="cycleAndLaunchSatellite()" title="Lancia un nuovo corpo" class="font-semibold px-4 py-2 rounded-xl bg-green-600 hover:bg-green-500">LANCIA NUOVO CORPO</button>
+            <button id="add-mouse-body-button" onclick="toggleMouseAddMode()" title="Aggiungi corpo con mouse" class="font-semibold px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500">AGGIUNGI CORPO (MOUSE)</button>
+        </div>
+        
+        <div class="absolute top-4 right-4 glass-panel p-3 rounded-xl flex items-center gap-3">
+            <span class="font-semibold">Velocità:</span>
+            <button onclick="changeSpeed(-1)" class="w-10 h-10 font-bold text-xl rounded-full bg-gray-600 hover:bg-gray-500">-</button>
+            <span id="speed-display" class="font-bold text-lg w-12 text-center">1x</span>
+            <button onclick="changeSpeed(1)" class="w-10 h-10 font-bold text-xl rounded-full bg-gray-600 hover:bg-gray-500">+</button>
+            <button id="trail-toggle" onclick="toggleTrailEffect()" class="ml-4 font-semibold px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500">TRACCIA ON</button>
+        </div>
+
+        <div id="legend" class="absolute bottom-4 left-4 glass-panel p-4 rounded-xl text-sm"></div>
+        <div id="timeline" class="absolute bottom-4 right-4 glass-panel p-4 rounded-xl text-center"></div>
+    </div>
+
+    <script>
+        // --- Gestione UI ---
+        const menuView = document.getElementById('menu-view');
+        const didatticaView = document.getElementById('didattica-view');
+        const simulazioneView = document.getElementById('simulazione-view');
+        const bodyCountSelect = document.getElementById('body-count');
+        const spiegazioneBase = document.getElementById('spiegazione-base');
+        const approfondimentoView = document.getElementById('approfondimento-view');
+        const speedDisplay = document.getElementById('speed-display');
+        const legendContainer = document.getElementById('legend');
+        const timelineDisplay = document.getElementById('timeline');
+
+        let currentSimulationSetup = null;
+        let animationFrameId = null;
+        let isGlowingTrail = false;
+        let isMouseAddMode = false;
+
+        function showSection(section) {
+            menuView.classList.add('hidden');
+            didatticaView.classList.add('hidden');
+            simulazioneView.classList.add('hidden');
+            if (section === 'menu') menuView.classList.remove('hidden');
+            else if (section === 'didattica') didatticaView.classList.remove('hidden');
+            else if (section === 'simulazione') simulazioneView.classList.remove('hidden');
+        }
+
+        function toggleDetails(show) {
+            spiegazioneBase.classList.toggle('hidden', show);
+            approfondimentoView.classList.toggle('hidden', !show);
+        }
+
+        // --- Logica Simulazione ---
+        const canvas = document.getElementById('simulation-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let bodies = [];
+        const G = 2; 
+        const dt = 0.08; 
+        const trailLength = 200;
+        let center = { x: 0, y: 0 };
+        let simulationSpeed = 1;
+        let simulationTime = 0; // In unità di simulazione
+
+        // --- Funzioni di Setup ---
+        function addBody(props) {
+            const defaults = { path: [], vx: 0, vy: 0, emoji: '' }; 
+            bodies.push({ ...defaults, ...props });
+        }
+        
+        function setupTerraSole() {
+            bodies = [];
+            addBody({ name: 'Sole', mass: 10000, x: center.x, y: center.y, color: '#FFD700' });
+            addBody({ name: 'Terra', mass: 10, x: center.x + 250, y: center.y, vy: 1.9, color: '#4A90E2' });
+            currentSimulationSetup = setupTerraSole;
+        }
+
+        function setupTerraLunaSole() {
+            bodies = [];
+            addBody({ name: 'Sole', mass: 10000, x: center.x, y: center.y, color: '#FFD700' });
+            addBody({ name: 'Terra', mass: 100, x: center.x + 300, y: center.y, vy: 1.8, color: '#4A90E2' });
+            addBody({ name: 'Luna', mass: 1, x: center.x + 320, y: center.y, vy: 1.8 + 2.2, color: '#E0E0E0' });
+            currentSimulationSetup = setupTerraLunaSole;
+        }
+
+        function setupSistemaSolare() {
+            bodies = [];
+            addBody({ name: 'Sole', mass: 15000, x: center.x, y: center.y, color: '#FFD700' });
+            const planetsData = [
+                { name: 'Mercurio', d: 80, v: 2.8, m: 2, c: '#A9A9A9' },
+                { name: 'Venere', d: 130, v: 2.2, m: 5, c: '#FFA500' },
+                { name: 'Terra', d: 200, v: 1.9, m: 6, c: '#4A90E2' },
+                { name: 'Marte', d: 280, v: 1.6, m: 3, c: '#FF4500' }
+            ];
+            planetsData.forEach(p => {
+                const angle = Math.random() * 2 * Math.PI;
+                addBody({
+                    name: p.name, mass: p.m, color: p.c,
+                    x: center.x + p.d * Math.cos(angle), y: center.y + p.d * Math.sin(angle),
+                    vx: -p.v * Math.sin(angle), vy: p.v * Math.cos(angle)
+                });
+            });
+            currentSimulationSetup = setupSistemaSolare;
+        }
+        
+        function setupCustom(numBodies) {
+             bodies = [];
+             addBody({ name: 'Stella', mass: 8000, x: center.x, y: center.y, color: '#FFD700' });
+             for (let i = 0; i < numBodies - 1; i++) {
+                const distance = 100 + Math.random() * (canvas.width / 3);
+                const angle = Math.random() * Math.PI * 2;
+                const orbitalVelocity = Math.sqrt(G * bodies[0].mass / distance);
+                addBody({
+                    name: `Corpo ${i+1}`,
+                    mass: Math.random() * 30 + 5,
+                    color: `hsl(${Math.random() * 360}, 90%, 70%)`,
+                    x: center.x + distance * Math.cos(angle),
+                    y: center.y + distance * Math.sin(angle),
+                    vx: -orbitalVelocity * Math.sin(angle) * 0.9 + (Math.random() - 0.5) * 0.2,
+                    vy: orbitalVelocity * Math.cos(angle) * 0.9 + (Math.random() - 0.5) * 0.2,
+                });
+            }
+            currentSimulationSetup = () => setupCustom(numBodies);
+        }
+
+        // --- Motore Fisico e Grafico ---
+        
+        function updatePhysics() {
+            simulationTime += dt;
+            const forces = bodies.map(() => ({ fx: 0, fy: 0 }));
+
+            for (let i = 0; i < bodies.length; i++) {
+                for (let j = i + 1; j < bodies.length; j++) {
+                    const bodyA = bodies[i];
+                    const bodyB = bodies[j];
+                    const dx = bodyB.x - bodyA.x;
+                    const dy = bodyB.y - bodyA.y;
+                    const distSq = dx * dx + dy * dy;
+                    const softening = 200;
+                    const dist = Math.sqrt(distSq + softening);
+                    const force = G * bodyA.mass * bodyB.mass / (distSq + softening);
+                    const fx = force * dx / dist;
+                    const fy = force * dy / dist;
+                    forces[i].fx += fx;
+                    forces[i].fy += fy;
+                    forces[j].fx -= fx;
+                    forces[j].fy -= fy;
+                }
+            }
+            
+            for (let i = 0; i < bodies.length; i++) {
+                const body = bodies[i];
+                const force = forces[i];
+                body.vx += force.fx / body.mass * dt;
+                body.vy += force.fy / body.mass * dt;
+                body.x += body.vx * dt;
+                body.y += body.vy * dt;
+
+                body.path.push({ x: body.x, y: body.y });
+                if (!isGlowingTrail && body.path.length > trailLength) {
+                    body.path.shift();
+                }
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgb(17, 24, 39)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (const body of bodies) {
+                // Scia
+                if (body.path.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(body.path[0].x, body.path[0].y);
+                    for (let i = 1; i < body.path.length; i++) {
+                        ctx.lineTo(body.path[i].x, body.path[i].y);
+                    }
+                    ctx.strokeStyle = body.color;
+                    
+                    if (isGlowingTrail) {
+                        // Effetto tratto continuo
+                        ctx.lineWidth = 2;
+                        ctx.globalAlpha = 1;
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
+                    } else {
+                        ctx.lineWidth = 1.5;
+                        ctx.globalAlpha = 0.5;
+                        ctx.lineCap = 'butt';
+                        ctx.lineJoin = 'miter';
+                    }
+                    
+                    ctx.stroke();
+                    ctx.globalAlpha = 1.0;
+                }
+                // Corpo
+                ctx.beginPath();
+                if (body.emoji) {
+                    ctx.font = '20px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = body.color;
+                    ctx.fillText(body.emoji, body.x, body.y);
+                } else {
+                    const radius = Math.cbrt(body.mass) * 1.5 + 2;
+                    ctx.arc(body.x, body.y, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = body.color;
+                    ctx.fill();
+                }
+            }
+        }
+        
+        function updateUI() {
+            // Timeline
+            const TIME_SCALE = 5; // 1 unità di tempo = 5 giorni
+            const totalDays = Math.floor(simulationTime * TIME_SCALE);
+            const years = Math.floor(totalDays / 365);
+            const days = totalDays % 365;
+            timelineDisplay.innerHTML = `<div class="font-bold text-cyan-300">Anno ${years}</div><div class="text-sm">Giorno ${days}</div>`;
+        }
+
+        function animate() {
+            for(let i = 0; i < simulationSpeed; i++) {
+                updatePhysics();
+            }
+            draw();
+            updateUI();
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            center.x = canvas.width / 2;
+            center.y = canvas.height / 2;
+            if (currentSimulationSetup) {
+                currentSimulationSetup(); 
+                updateLegend();
+            }
+        }
+
+        function updateLegend() {
+            legendContainer.innerHTML = '<h3 class="font-bold mb-2 text-cyan-300">Legenda</h3>';
+            bodies.forEach(body => {
+                if (body.name !== 'Nuovo Corpo' && body.name !== 'Corpo Manuale') {
+                    legendContainer.innerHTML += `
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="w-3 h-3 rounded-full" style="background-color: ${body.color};"></div>
+                            <span>${body.name}</span>
+                        </div>`;
+                }
+            });
+        }
+
+        function launchSatellite() {
+            let startX, startY;
+            const padding = 50; // Distanza dal bordo per iniziare leggermente fuori dallo schermo
+            
+            // Genera un punto di partenza casuale a 360 gradi sul bordo dello schermo
+            const angle = Math.random() * 2 * Math.PI;
+            const maxDim = Math.max(canvas.width, canvas.height) / 2;
+            startX = center.x + Math.cos(angle) * (maxDim + padding);
+            startY = center.y + Math.sin(angle) * (maxDim + padding);
+
+            // Trova il pianeta più piccolo (escludendo il Sole/Stella) come target
+            let minPlanetMass = Infinity;
+            let targetX = center.x; // Default al centro se non ci sono altri corpi
+            let targetY = center.y; 
+
+            let centralBody = bodies.find(b => b.name === 'Sole' || b.name === 'Stella');
+            if (!centralBody && bodies.length > 0) {
+                centralBody = bodies.reduce((prev, current) => (prev.mass > current.mass) ? prev : current);
+            }
+            
+            for (const body of bodies) {
+                if (body !== centralBody) { 
+                    if (body.mass < minPlanetMass) {
+                        minPlanetMass = body.mass;
+                        targetX = body.x;
+                        targetY = body.y;
+                    }
+                }
+            }
+
+            // Se non sono stati trovati altri pianeti, usa la massa del Sole per il calcolo e punta al centro
+            if (minPlanetMass === Infinity) {
+                minPlanetMass = centralBody ? centralBody.mass : 1; // Massa base per il calcolo
+            }
+
+            // Trova la velocità minima tra tutti i corpi esistenti (escluso il Sole/Stella)
+            let minSpeed = Infinity;
+            if (bodies.length > 0) {
+                for (const body of bodies) {
+                    if (body !== centralBody) {
+                        const speed = Math.sqrt(body.vx * body.vx + body.vy * body.vy);
+                        if (speed < minSpeed) {
+                            minSpeed = speed;
+                        }
+                    }
+                }
+            } 
+            // Se non ci sono corpi non solari, o la velocità minima è ancora Infinity, usa una velocità di default
+            if (minSpeed === Infinity) {
+                minSpeed = 1.0; // Velocità di default più bassa
+            }
+            minSpeed *= 1.2; // Un piccolo boost per assicurarsi che si muova
+
+            // Calcola la direzione verso il target (pianeta più piccolo o centro)
+            let dx = targetX - startX; // Vettore dal punto di lancio al target
+            let dy = targetY - startY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Componenti unitarie del vettore radiale (verso il target)
+            const unit_dx = dx / dist;
+            const unit_dy = dy / dist;
+
+            // Componenti unitarie del vettore tangenziale (perpendicolare al radiale, per orbita)
+            // Utilizzo (-unit_dy, unit_dx) per una rotazione in senso antiorario
+            const unit_vx_tangential = -unit_dy;
+            const unit_vy_tangential = unit_dx;
+
+            // Combinazione delle componenti: una forte spinta radiale e una piccola componente tangenziale
+            const radial_ratio = 0.8; 
+            const tangential_ratio = 0.2; 
+
+            let vx = (unit_dx * radial_ratio + unit_vx_tangential * tangential_ratio) * minSpeed;
+            let vy = (unit_dy * radial_ratio + unit_vy_tangential * tangential_ratio) * minSpeed;
+
+            // Normalizza il vettore risultante e scala alla minSpeed complessiva
+            const combined_mag = Math.sqrt(vx * vx + vy * vy);
+            if (combined_mag > 0) {
+                vx = (vx / combined_mag) * minSpeed;
+                vy = (vy / combined_mag) * minSpeed;
+            }
+
+            addBody({
+                name: 'Nuovo Corpo',
+                mass: minPlanetMass * 4, // Massa 4x del più piccolo corpo non solare
+                color: `hsl(${Math.random() * 360}, 90%, 70%)`, // Colore randomico
+                x: startX,
+                y: startY,
+                vx: vx,
+                vy: vy
+            });
+            updateLegend(); 
+        }
+
+        function cycleAndLaunchSatellite() {
+            launchSatellite(); 
+        }
+
+        function toggleMouseAddMode() {
+            isMouseAddMode = !isMouseAddMode;
+            const button = document.getElementById('add-mouse-body-button');
+            if (isMouseAddMode) {
+                button.textContent = 'DISATTIVA AGGIUNGI (MOUSE)';
+                canvas.style.cursor = 'crosshair';
+            } else {
+                button.textContent = 'AGGIUNGI CORPO (MOUSE)';
+                canvas.style.cursor = 'default';
+            }
+        }
+
+        canvas.addEventListener('click', (event) => {
+            if (isMouseAddMode) {
+                // Trova la massa più piccola tra i corpi esistenti (escludendo Sole/Stella)
+                let minPlanetMass = Infinity;
+                let centralBody = bodies.find(b => b.name === 'Sole' || b.name === 'Stella');
+
+                if (!centralBody && bodies.length > 0) {
+                    centralBody = bodies.reduce((prev, current) => (prev.mass > current.mass) ? prev : current);
+                }
+                
+                for (const body of bodies) {
+                    if (body !== centralBody) { 
+                        if (body.mass < minPlanetMass) {
+                            minPlanetMass = body.mass;
+                        }
+                    }
+                }
+                if (minPlanetMass === Infinity) {
+                    minPlanetMass = centralBody ? centralBody.mass : 1; // Massa base per il calcolo
+                }
+
+                addBody({
+                    name: 'Corpo Manuale', // Nome distinto per i corpi aggiunti con mouse
+                    mass: minPlanetMass * 4, // Massa 4x del più piccolo corpo non solare
+                    color: `hsl(${Math.random() * 360}, 90%, 70%)`, // Colore randomico
+                    x: event.clientX,
+                    y: event.clientY,
+                    vx: 0,
+                    vy: 0
+                });
+                updateLegend();
+            }
+        });
+
+        // --- Controlli Principali ---
+        
+        function resetSimulationState() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            simulationTime = 0;
+            simulationSpeed = 1;
+            speedDisplay.textContent = '1x';
+            resizeCanvas();
+        }
+
+        function startSimulation(type) {
+            resetSimulationState();
+            if (type === 'terra-sole') setupTerraSole();
+            else if (type === 'terra-luna-sole') setupTerraLunaSole();
+            else if (type === 'sistema-solare') setupSistemaSolare();
+            
+            // Assicurati che la modalità di aggiunta con mouse sia disattivata all'inizio di una simulazione predefinita
+            if (isMouseAddMode) toggleMouseAddMode();
+
+            updateLegend();
+            showSection('simulazione');
+            animate();
+        }
+
+        function startCustomSimulation() {
+            resetSimulationState();
+            const numBodies = parseInt(bodyCountSelect.value);
+            setupCustom(numBodies);
+
+            // Assicurati che la modalità di aggiunta con mouse sia disattivata all'inizio di una simulazione personalizzata
+            if (isMouseAddMode) toggleMouseAddMode();
+
+            updateLegend();
+            showSection('simulazione');
+            animate();
+        }
+
+        function startInteractiveSimulation() {
+            resetSimulationState();
+            bodies = []; // Inizia con un canvas vuoto
+            
+            // Aggiungi alcuni corpi casuali iniziali per un avvio meno vuoto
+            for (let i = 0; i < 5; i++) {
+                addBody({
+                    name: 'Corpo Interattivo',
+                    mass: Math.random() * 10 + 2, // Masse più piccole per interazioni visibili
+                    color: `hsl(${Math.random() * 360}, 90%, 70%)`,
+                    x: center.x + (Math.random() - 0.5) * 400,
+                    y: center.y + (Math.random() - 0.5) * 300,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5
+                });
+            }
+
+            // Attiva la modalità di aggiunta con mouse per questa simulazione
+            if (!isMouseAddMode) toggleMouseAddMode();
+
+            updateLegend();
+            showSection('simulazione');
+            animate();
+        }
+        
+        function stopSimulationAndShowMenu() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            currentSimulationSetup = null;
+            showSection('menu');
+        }
+
+        function restartCurrentSimulation() {
+            if (currentSimulationSetup) {
+                resetSimulationState();
+                currentSimulationSetup();
+                updateLegend();
+                animate();
+            }
+        }
+        
+        function changeSpeed(delta) {
+            simulationSpeed += delta;
+            if (simulationSpeed < 1) simulationSpeed = 1;
+            if (simulationSpeed > 16) simulationSpeed = 16;
+            speedDisplay.textContent = `${simulationSpeed}x`;
+        }
+
+        function toggleTrailEffect() {
+            isGlowingTrail = !isGlowingTrail;
+            const button = document.getElementById('trail-toggle');
+            button.textContent = isGlowingTrail ? 'TRACCIA OFF' : 'TRACCIA ON';
+            button.classList.toggle('bg-purple-600');
+            button.classList.toggle('bg-purple-500');
+
+            // Pulisci le tracce se la modalità fluorescente è stata disattivata
+            if (!isGlowingTrail) {
+                bodies.forEach(body => body.path = []);
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+    </script>
+</body>
+</html>
