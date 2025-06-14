@@ -63,6 +63,8 @@
             <button onclick="startSimulation('terra-luna-sole')" class="menu-button font-semibold p-6 rounded-xl bg-blue-600 hover:bg-blue-500">Terra, Luna & Sole</button>
             <button onclick="startSimulation('sistema-solare')" class="menu-button font-semibold p-6 rounded-xl bg-red-600 hover:bg-red-500">Sistema Solare</button>
             <button onclick="startInteractiveSimulation()" class="menu-button font-semibold p-6 rounded-xl bg-purple-600 hover:bg-purple-500 col-span-1 md:col-span-3">Simulazione Interattiva</button>
+            <button onclick="startThreeSunsNMode()" class="menu-button font-semibold p-6 rounded-xl bg-teal-600 hover:bg-teal-500 col-span-1 md:col-span-3">Simulazione: 3 Soli N-Modi</button>
+            <button onclick="startThreeBodiesTriangularMode()" class="menu-button font-semibold p-6 rounded-xl bg-orange-600 hover:bg-orange-500 col-span-1 md:col-span-3">Simulazione: 3 Corpi Triangolari</button>
             <div class="col-span-1 md:col-span-3 glass-panel rounded-xl p-4 flex flex-col md:flex-row items-center justify-center gap-4">
                  <label for="body-count" class="font-semibold">Oppure crea il tuo universo:</label>
                  <select id="body-count" class="bg-gray-700 text-white rounded-md p-2">
@@ -165,6 +167,7 @@
         let animationFrameId = null;
         let isGlowingTrail = false;
         let isMouseAddMode = false;
+        let quadrantSimulations = []; // Array per le simulazioni in quadrante
 
         function showSection(section) {
             menuView.classList.add('hidden');
@@ -185,7 +188,7 @@
         const ctx = canvas.getContext('2d');
         
         let bodies = [];
-        const G = 2; 
+        const G = 5; 
         const dt = 0.08; 
         const trailLength = 200;
         let center = { x: 0, y: 0 };
@@ -257,38 +260,99 @@
         
         function updatePhysics() {
             simulationTime += dt;
-            const forces = bodies.map(() => ({ fx: 0, fy: 0 }));
-
-            for (let i = 0; i < bodies.length; i++) {
-                for (let j = i + 1; j < bodies.length; j++) {
-                    const bodyA = bodies[i];
-                    const bodyB = bodies[j];
-                    const dx = bodyB.x - bodyA.x;
-                    const dy = bodyB.y - bodyA.y;
-                    const distSq = dx * dx + dy * dy;
-                    const softening = 200;
-                    const dist = Math.sqrt(distSq + softening);
-                    const force = G * bodyA.mass * bodyB.mass / (distSq + softening);
-                    const fx = force * dx / dist;
-                    const fy = force * dy / dist;
-                    forces[i].fx += fx;
-                    forces[i].fy += fy;
-                    forces[j].fx -= fx;
-                    forces[j].fy -= fy;
-                }
-            }
             
-            for (let i = 0; i < bodies.length; i++) {
-                const body = bodies[i];
-                const force = forces[i];
-                body.vx += force.fx / body.mass * dt;
-                body.vy += force.fy / body.mass * dt;
-                body.x += body.vx * dt;
-                body.y += body.vy * dt;
+            // Se ci sono simulazioni a quadranti, le gestiamo separatamente
+            if (quadrantSimulations.length > 0) {
+                for (const qSim of quadrantSimulations) {
+                    const qBodies = qSim.bodies;
+                    const qBounds = qSim.bounds;
+                    const forces = qBodies.map(() => ({ fx: 0, fy: 0 }));
 
-                body.path.push({ x: body.x, y: body.y });
-                if (!isGlowingTrail && body.path.length > trailLength) {
-                    body.path.shift();
+                    for (let i = 0; i < qBodies.length; i++) {
+                        for (let j = i + 1; j < qBodies.length; j++) {
+                            const bodyA = qBodies[i];
+                            const bodyB = qBodies[j];
+                            const dx = bodyB.x - bodyA.x;
+                            const dy = bodyB.y - bodyA.y;
+                            const distSq = dx * dx + dy * dy;
+                            const softening = 1;
+                            const dist = Math.sqrt(distSq + softening);
+                            const force = G * bodyA.mass * bodyB.mass / (distSq + softening);
+                            const fx = force * dx / dist;
+                            const fy = force * dy / dist;
+                            forces[i].fx += fx;
+                            forces[i].fy += fy;
+                            forces[j].fx -= fx;
+                            forces[j].fy -= fy;
+                        }
+                    }
+                    
+                    for (let i = 0; i < qBodies.length; i++) {
+                        const body = qBodies[i];
+                        const force = forces[i];
+                        body.vx += force.fx / body.mass * dt;
+                        body.vy += force.fy / body.mass * dt;
+                        body.x += body.vx * dt;
+                        body.y += body.vy * dt;
+
+                        // Aggiungi la logica di collisione con i bordi del quadrante
+                        const radius = Math.cbrt(body.mass) * 1.5 + 2; 
+
+                        // Collisione con bordi orizzontali
+                        if (body.x - radius < qBounds.x) {
+                            body.x = qBounds.x + radius; 
+                            body.vx *= -1; 
+                        } else if (body.x + radius > qBounds.x + qBounds.width) {
+                            body.x = qBounds.x + qBounds.width - radius;
+                            body.vx *= -1; 
+                        }
+
+                        // Collisione con bordi verticali
+                        if (body.y - radius < qBounds.y) {
+                            body.y = qBounds.y + radius; 
+                            body.vy *= -1; 
+                        } else if (body.y + radius > qBounds.y + qBounds.height) {
+                            body.y = qBounds.y + qBounds.height - radius;
+                            body.vy *= -1; 
+                        }
+
+                        body.path.push({ x: body.x, y: body.y });
+                    }
+                }
+            } else { // Comportamento per simulazioni singole (non a quadranti)
+                const forces = bodies.map(() => ({ fx: 0, fy: 0 }));
+
+                for (let i = 0; i < bodies.length; i++) {
+                    for (let j = i + 1; j < bodies.length; j++) {
+                        const bodyA = bodies[i];
+                        const bodyB = bodies[j];
+                        const dx = bodyB.x - bodyA.x;
+                        const dy = bodyB.y - bodyA.y;
+                        const distSq = dx * dx + dy * dy;
+                        const softening = 200;
+                        const dist = Math.sqrt(distSq + softening);
+                        const force = G * bodyA.mass * bodyB.mass / (distSq + softening);
+                        const fx = force * dx / dist;
+                        const fy = force * dy / dist;
+                        forces[i].fx += fx;
+                        forces[i].fy += fy;
+                        forces[j].fx -= fx;
+                        forces[j].fy -= fy;
+                    }
+                }
+                
+                for (let i = 0; i < bodies.length; i++) {
+                    const body = bodies[i];
+                    const force = forces[i];
+                    body.vx += force.fx / body.mass * dt;
+                    body.vy += force.fy / body.mass * dt;
+                    body.x += body.vx * dt;
+                    body.y += body.vy * dt;
+
+                    body.path.push({ x: body.x, y: body.y });
+                    if (!isGlowingTrail && body.path.length > trailLength) {
+                        body.path.shift();
+                    }
                 }
             }
         }
@@ -297,7 +361,42 @@
             ctx.fillStyle = 'rgb(17, 24, 39)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            for (const body of bodies) {
+            // Disegna i bordi dei quadranti
+            if (quadrantSimulations.length > 0) {
+                const numRows = 4; 
+                const numCols = 5; 
+                const qWidth = canvas.width / numCols;
+                const qHeight = canvas.height / numRows;
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+
+                for (let r = 0; r <= numRows; r++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, r * qHeight);
+                    ctx.lineTo(canvas.width, r * qHeight);
+                    ctx.stroke();
+                }
+                for (let c = 0; c <= numCols; c++) {
+                    ctx.beginPath();
+                    ctx.moveTo(c * qWidth, 0);
+                    ctx.lineTo(c * qWidth, canvas.height);
+                    ctx.stroke();
+                }
+            }
+
+            // Disegna i corpi e le tracce
+            let bodiesToDraw = [];
+            if (quadrantSimulations.length > 0) {
+                // Colleziona tutti i corpi da tutte le simulazioni attive nei quadranti
+                for (const qSim of quadrantSimulations) {
+                    bodiesToDraw = bodiesToDraw.concat(qSim.bodies);
+                }
+            } else {
+                bodiesToDraw = bodies;
+            }
+
+            for (const body of bodiesToDraw) {
                 // Scia
                 if (body.path.length > 1) {
                     ctx.beginPath();
@@ -307,8 +406,8 @@
                     }
                     ctx.strokeStyle = body.color;
                     
-                    if (isGlowingTrail) {
-                        // Effetto tratto continuo
+                    // In modalità N-Modi, le tracce sono sempre continue e con effetto matita/luminoso
+                    if (quadrantSimulations.length > 0 || isGlowingTrail) {
                         ctx.lineWidth = 2;
                         ctx.globalAlpha = 1;
                         ctx.lineCap = 'round';
@@ -533,6 +632,19 @@
             simulationSpeed = 1;
             speedDisplay.textContent = '1x';
             resizeCanvas();
+            
+            // Disabilita i pulsanti di lancio e aggiunta mouse per la nuova modalità
+            const launchButton = document.getElementById('launch-new-body-button');
+            if (launchButton) {
+                launchButton.disabled = true;
+            }
+            const addMouseButton = document.getElementById('add-mouse-body-button');
+            if (addMouseButton) {
+                addMouseButton.disabled = true;
+                if (isMouseAddMode) toggleMouseAddMode(); // Assicurati di disattivare la modalità se attiva
+            }
+
+            quadrantSimulations = []; // Resetta le simulazioni dei quadranti
         }
 
         function startSimulation(type) {
@@ -543,6 +655,12 @@
             
             // Assicurati che la modalità di aggiunta con mouse sia disattivata all'inizio di una simulazione predefinita
             if (isMouseAddMode) toggleMouseAddMode();
+
+            // Abilita i pulsanti di lancio e aggiunta mouse per le simulazioni standard
+            const launchButton = document.getElementById('launch-new-body-button');
+            if (launchButton) launchButton.disabled = false;
+            const addMouseButton = document.getElementById('add-mouse-body-button');
+            if (addMouseButton) addMouseButton.disabled = false;
 
             updateLegend();
             showSection('simulazione');
@@ -556,6 +674,12 @@
 
             // Assicurati che la modalità di aggiunta con mouse sia disattivata all'inizio di una simulazione personalizzata
             if (isMouseAddMode) toggleMouseAddMode();
+
+            // Abilita i pulsanti di lancio e aggiunta mouse per le simulazioni personalizzate
+            const launchButton = document.getElementById('launch-new-body-button');
+            if (launchButton) launchButton.disabled = false;
+            const addMouseButton = document.getElementById('add-mouse-body-button');
+            if (addMouseButton) addMouseButton.disabled = false;
 
             updateLegend();
             showSection('simulazione');
@@ -582,11 +706,149 @@
             // Attiva la modalità di aggiunta con mouse per questa simulazione
             if (!isMouseAddMode) toggleMouseAddMode();
 
+            // Abilita i pulsanti di lancio e aggiunta mouse solo per la modalità interattiva
+            const launchButton = document.getElementById('launch-new-body-button');
+            if (launchButton) launchButton.disabled = false;
+            const addMouseButton = document.getElementById('add-mouse-body-button');
+            if (addMouseButton) addMouseButton.disabled = false;
+
             updateLegend();
             showSection('simulazione');
             animate();
         }
-        
+
+        function startThreeSunsNMode() {
+            resetSimulationState();
+            bodies = []; // Assicurati che la lista globale dei corpi sia vuota
+            legendContainer.innerHTML = '<h3 class="font-bold mb-2 text-cyan-300">Simulazione N-Modi</h3>';
+
+            const numRows = 4; 
+            const numCols = 5; 
+            const qWidth = canvas.width / numCols;
+            const qHeight = canvas.height / numRows;
+
+            for (let r = 0; r < numRows; r++) {
+                for (let c = 0; c < numCols; c++) {
+                    // Salta il primo quadrante (in alto a sinistra) che sarà dedicato al menu
+                    if (r === 0 && c === 0) {
+                        continue;
+                    }
+
+                    const quadrantBodies = [];
+                    const qMinX = c * qWidth;
+                    const qMinY = r * qHeight;
+                    const qMaxX = qMinX + qWidth;
+                    const qMaxY = qMinY + qHeight;
+
+                    const mass = 20; // Massa aumentata per interazioni più forti
+
+                    for (let i = 0; i < 3; i++) {
+                        // Posizione casuale all'interno del quadrante
+                        const x = qMinX + Math.random() * qWidth;
+                        const y = qMinY + Math.random() * qHeight;
+
+                        // Velocità completamente casuale, ridotta per interazioni più evidenti
+                        const vx = (Math.random() - 0.5) * 1; 
+                        const vy = (Math.random() - 0.5) * 1; 
+                        
+                        quadrantBodies.push({
+                            name: `Sole ${i+1}`,
+                            mass: mass,
+                            color: `hsl(${Math.random() * 360}, 90%, 70%)`,
+                            x: x,
+                            y: y,
+                            vx: vx,
+                            vy: vy,
+                            path: []
+                        });
+                    }
+                    // Memorizza i corpi e i limiti del quadrante
+                    quadrantSimulations.push({
+                        bodies: quadrantBodies,
+                        bounds: { x: qMinX, y: qMinY, width: qWidth, height: qHeight }
+                    });
+                }
+            }
+            // La legenda in questa modalità non è utile, quindi la svuotiamo dopo averla impostata
+            legendContainer.innerHTML = '';
+
+            currentSimulationSetup = startThreeSunsNMode; // Imposta la funzione per il riavvio
+            showSection('simulazione');
+            animate();
+        }
+
+        function startThreeBodiesTriangularMode() {
+            resetSimulationState();
+            bodies = []; 
+            legendContainer.innerHTML = '<h3 class="font-bold mb-2 text-cyan-300">Simulazione: 3 Corpi Triangolari</h3>';
+
+            const numRows = 4; 
+            const numCols = 5; 
+            const qWidth = canvas.width / numCols;
+            const qHeight = canvas.height / numRows;
+
+            for (let r = 0; r < numRows; r++) {
+                for (let c = 0; c < numCols; c++) {
+                    // Salta il primo quadrante (in alto a sinistra) che sarà dedicato al menu
+                    if (r === 0 && c === 0) {
+                        continue;
+                    }
+
+                    const quadrantBodies = [];
+                    const qMinX = c * qWidth;
+                    const qMinY = r * qHeight;
+                    const qCenterX = qMinX + qWidth / 2;
+                    const qCenterY = qMinY + qHeight / 2;
+
+                    const mass = 10; // Massa identica per i 3 corpi
+                    const triangleSide = Math.min(qWidth, qHeight) * 0.3; // Lato del triangolo
+                    const centroidDistance = triangleSide / Math.sqrt(3); // Distanza dal centro al vertice
+
+                    const initialRotation = Math.random() * Math.PI * 2; // Rotazione iniziale casuale
+                    const baseOrbitalSpeed = Math.sqrt(G * mass / centroidDistance) * 0.5; // Aumentato leggermente per traiettorie più dinamiche
+
+                    for (let i = 0; i < 3; i++) {
+                        const angle = initialRotation + (i * Math.PI * 2 / 3); // Angoli a 120 gradi
+                        const x = qCenterX + centroidDistance * Math.cos(angle);
+                        const y = qCenterY + centroidDistance * Math.sin(angle);
+
+                        // Velocità tangenziale per creare orbita attorno al centro
+                        const vx = -baseOrbitalSpeed * Math.sin(angle) + (Math.random() - 0.5) * 0.3; // Perturbazione aumentata
+                        const vy = baseOrbitalSpeed * Math.cos(angle) + (Math.random() - 0.5) * 0.3; // Perturbazione aumentata
+                        
+                        quadrantBodies.push({
+                            name: `Corpo ${i+1}`,
+                            mass: mass,
+                            color: `hsl(${Math.random() * 360}, 90%, 70%)`,
+                            x: x,
+                            y: y,
+                            vx: vx,
+                            vy: vy,
+                            path: []
+                        });
+                    }
+                    quadrantSimulations.push({
+                        bodies: quadrantBodies,
+                        bounds: { x: qMinX, y: qMinY, width: qWidth, height: qHeight }
+                    });
+                }
+            }
+            legendContainer.innerHTML = '';
+
+            // Abilita i pulsanti di lancio e aggiunta mouse per questa modalità
+            const launchButton = document.getElementById('launch-new-body-button');
+            if (launchButton) launchButton.disabled = false;
+            const addMouseButton = document.getElementById('add-mouse-body-button');
+            if (addMouseButton) {
+                addMouseButton.disabled = false;
+                if (!isMouseAddMode) toggleMouseAddMode(); // Attiva la modalità mouse se non già attiva
+            }
+
+            currentSimulationSetup = startThreeBodiesTriangularMode; // Imposta la funzione per il riavvio
+            showSection('simulazione');
+            animate();
+        }
+
         function stopSimulationAndShowMenu() {
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
