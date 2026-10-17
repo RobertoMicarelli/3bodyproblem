@@ -68,6 +68,6 @@ An interactive, educational exploration of the gravitational dance between celes
 
 ---
 
-**AI-utati** · By Roberto Micarelli · Formatore, Coach, Consulente · [ai-utati.it](https://www.ai-utati.it)
+**AI-utati** · By Roberto Micarelli · Formatore, Coach, Consulente · [ai-utati.it](https://www.ai-utati.it) · [Scheda sul sito](https://www.ai-utati.it/risorse/problema-n-corpi/) · [Tutti i progetti](https://github.com/RobertoMicarelli/brand-ai-utati)
 
 **Provalo ora:** apri la demo, aggiungi un corpo vicino alla Terra e guarda cosa succede all'orbita.
