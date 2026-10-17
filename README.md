@@ -1,152 +1,73 @@
-# Il Problema degli N-Corpi
+<p align="center">
+  <img src="assets/banner.png" alt="Il problema degli N-corpi: la danza gravitazionale tra corpi celesti" width="100%">
+</p>
 
-Un'esplorazione interattiva e didattica della danza gravitazionale tra corpi celesti. Questa applicazione web permette di simulare il comportamento di sistemi a N-corpi, dal semplice sistema Terra-Sole a configurazioni personalizzate e interattive.
+<p align="center">
+  <a href="https://robertomicarelli.github.io/3bodyproblem/"><img alt="Demo online" src="https://img.shields.io/badge/demo-online-006E87?labelColor=0F2A44&style=flat-square"></a>
+  <img alt="Un solo file HTML" src="https://img.shields.io/badge/formato-un%20solo%20file%20HTML-006E87?labelColor=0F2A44&style=flat-square">
+  <img alt="Nessuna dipendenza" src="https://img.shields.io/badge/dipendenze-nessuna-006E87?labelColor=0F2A44&style=flat-square">
+  <a href="#english"><img alt="English below" src="https://img.shields.io/badge/English-below-006E87?labelColor=0F2A44&style=flat-square"></a>
+</p>
 
-![Menu](./menu.png)
+**Aggiungi un corpo e guarda cosa succede.** Un'applicazione web per simulare la danza gravitazionale tra corpi celesti, dal semplice sistema Terra-Sole a universi che costruisci tu, cliccando.
 
-## Funzionalità Principali
+## In 30 secondi
 
-*   **Menu Principale**: Avvia simulazioni predefinite (Terra & Sole, Terra, Luna & Sole, Sistema Solare), crea simulazioni personalizzate con un numero variabile di corpi, o accedi alla sezione didattica.
-*   **Sezione Didattica**: Spiegazioni sul problema dei due e tre corpi, la teoria del caos, i Punti di Lagrange e video educativi.
-*   **Simulazioni Predefinite**: Osserva orbite stabilite e sistemi noti.
-*   **Simulazione Personalizzata**: Genera un universo con un numero specifico di corpi e osserva le loro interazioni casuali.
-*   **Simulazione Interattiva**: Aggiungi corpi manualmente cliccando sul canvas. I corpi iniziano da fermi e interagiscono con il sistema esistente.
-*   **Lancio Nuovo Corpo**: Lancia un corpo da un punto casuale dello schermo, con massa e velocità calcolate per interagire con il corpo più piccolo esistente, creando orbite o impatti.
-*   **Controllo della Velocità**: Modifica la velocità di simulazione in tempo reale.
-*   **Traccia ON/OFF**: Attiva una traccia continua "a matita" per visualizzare le traiettorie complete dei corpi. Quando disattivata, le tracce hanno una lunghezza limitata.
-*   **Leggenda e Timeline**: Monitora i corpi nella simulazione e il tempo simulato.
+| Scheda | Dettaglio |
+|---|---|
+| **Cos'è** | Un simulatore interattivo del problema degli N-corpi, con una sezione didattica |
+| **Per chi** | Chi insegna o studia fisica e astronomia, e chi vuole *vedere* cosa significa caos |
+| **Come provarlo** | [Apri la demo](https://robertomicarelli.github.io/3bodyproblem/) |
 
-## Come Avviare l'Applicazione
+<p align="center">
+  <img src="menu.png" alt="Menu principale con le simulazioni disponibili" width="48%">
+  <img src="schermata.png" alt="Una simulazione in corso" width="48%">
+</p>
 
-1.  Scarica o clona il repository contenente `3bp.html` e `central_force.js`.
-2.  Apri il file `3bp.html` nel tuo browser web preferito.
+## Cosa puoi fare
 
-Non sono necessarie dipendenze o server web, l'applicazione funziona direttamente nel browser.
+| Modalità | Dettaglio |
+|---|---|
+| **Simulazioni predefinite** | Terra e Sole, Terra, Luna e Sole, Sistema Solare |
+| **Simulazione personalizzata** | Scegli quanti corpi e osserva le interazioni casuali |
+| **Simulazione interattiva** | Clicca sul canvas per aggiungere corpi: partono da fermi e interagiscono con il sistema |
+| **Lancio di un nuovo corpo** | Parte da un punto casuale dello schermo, con massa e velocità calcolate per interagire con il corpo più piccolo: orbite o impatti |
+| **Sezione didattica** | Problema dei due e dei tre corpi, teoria del caos, punti di Lagrange, video educativi |
 
-## Utilizzo
+## I controlli
 
-*   **Navigazione**: Usa i pulsanti nel menu principale per scegliere la modalità di simulazione.
-*   **Controlli di Simulazione**:
-    *   **<- Menu**: Torna al menu principale.
-    *   **Riavvia**: Resetta la simulazione corrente.
-    *   **Velocità +/-**: Aumenta o diminuisce la velocità di simulazione.
-    *   **TRACCIA ON/OFF**: Attiva/disattiva la visualizzazione della traccia continua per i corpi.
-    *   **LANCIA NUOVO CORPO**: Lancia un nuovo corpo nel sistema con massa e velocità dinamiche.
-    *   **AGGIUNGI CORPO (MOUSE)**: Abilita/disabilita la modalità per aggiungere corpi cliccando sul canvas.
+| Comando | Cosa fa |
+|---|---|
+| **← Menu** | Torna al menu principale |
+| **Riavvia** | Riparte da capo |
+| **Velocità + / −** | Cambia la velocità della simulazione in tempo reale |
+| **Traccia ON/OFF** | Attiva la traccia continua «a matita» delle traiettorie; da spenta le tracce hanno lunghezza limitata |
+| **Lancia nuovo corpo** | Lancia un corpo nel sistema |
+| **Aggiungi corpo (mouse)** | Attiva o disattiva l'aggiunta di corpi con il clic |
 
- ![Menu](./schermata.png)
+Una leggenda e una timeline mostrano i corpi presenti e il tempo simulato.
+
+## Come si avvia
+
+1. **In rete:** apri la [demo](https://robertomicarelli.github.io/3bodyproblem/).
+2. **In locale:** scarica o clona il repository e apri `index.html` nel browser. Nessuna dipendenza, nessun server.
 
 ## Crediti
 
-*   Ispirazione per l'interattività e l'aggiunta di corpi via mouse dalla logica trovata in `central_force.js` (Processing).
+L'idea di aggiungere corpi con il mouse nasce dalla logica di `central_force.js` (Processing).
 
 ---
 
-# N-Body Problem Simulator
+## English
 
-An interactive and educational exploration of the gravitational dance between celestial bodies. This web application allows you to simulate the behavior of N-body systems, from the simple Earth-Sun system to custom and interactive configurations.
+An interactive, educational exploration of the gravitational dance between celestial bodies. It simulates N-body systems, from the simple Earth-Sun pair to custom and interactive configurations.
 
-## Key Features
+**Features:** predefined simulations (Earth and Sun; Earth, Moon and Sun; Solar System); custom simulations with a chosen number of bodies; click-to-add bodies that start at rest; launch a new body with computed mass and velocity; real-time speed control; continuous pencil-like trail on/off; legend and timeline; an educational section on the two- and three-body problem, chaos theory and Lagrange points.
 
-*   **Main Menu**: Start predefined simulations (Earth & Sun, Earth, Moon & Sun, Solar System), create custom simulations with a variable number of bodies, or access the educational section.
-*   **Educational Section**: Explanations on the two and three-body problem, chaos theory, Lagrange Points, and educational videos.
-*   **Predefined Simulations**: Observe established orbits and known systems.
-*   **Custom Simulation**: Generate a universe with a specific number of bodies and observe their random interactions.
-*   **Interactive Simulation**: Add bodies manually by clicking on the canvas. Bodies start from rest and interact with the existing system.
-*   **Launch New Body**: Launch a new body into the system with dynamic mass and velocity calculated to interact with the smallest existing body, creating orbits or impacts.
-*   **Speed Control**: Adjust the simulation speed in real-time.
-*   **Trail ON/OFF**: Toggle a continuous "pencil-like" trail to visualize the complete trajectories of the bodies. When off, trails have a limited length.
-*   **Legend and Timeline**: Monitor bodies in the simulation and simulated time.
+**Run it:** open the [live demo](https://robertomicarelli.github.io/3bodyproblem/), or clone the repository and open `index.html`. No dependencies, no server.
 
-## How to Run the Application
+---
 
-1.  Download or clone the repository containing `3bp.html` and `central_force.js`.
-2.  Open the `3bp.html` file in your preferred web browser.
+**AI-utati** · By Roberto Micarelli · Formatore, Coach, Consulente · [ai-utati.it](https://www.ai-utati.it)
 
-No dependencies or web servers are required; the application runs directly in the browser.
-
-## Usage
-
-*   **Navigation**: Use the buttons in the main menu to choose the simulation mode.
-*   **Simulation Controls**:
-    *   **<- Menu**: Return to the main menu.
-    *   **Restart**: Reset the current simulation.
-    *   **Speed +/-**: Increase or decrease the simulation speed.
-    *   **Trail ON/OFF**: Toggle the continuous trail visualization for bodies.
-    *   **LAUNCH NEW BODY**: Launch a new body into the system with dynamic mass and velocity.
-    *   **ADD BODY (MOUSE)**: Enable/disable the mode for adding bodies by clicking on the canvas.
-
-## Credits
-
-*   Inspiration for interactivity and adding bodies via mouse from the logic found in `central_force.js` (Processing).
-
-## 🚀 Deploy su GitHub Pages
-
-1. Assicurati di avere i seguenti file nella repository:
-   - `index.html` (o `space_iphone.html` rinominato)
-   - `space_iphone.js`
-   - `README.md`
-
-2. Vai nelle impostazioni della repository (Settings)
-3. Nella sezione "Pages" (sotto "Code and automation")
-4. In "Source" seleziona "Deploy from a branch"
-5. Seleziona il branch "main" e la cartella "/ (root)"
-6. Clicca "Save"
-
-Il gioco sarà disponibile all'URL: `https://[tuo-username].github.io/[nome-repository]`
-
-## 🎮 Come Giocare (versione mobile touch)
-
-- **Muovi il cannone**: usa le frecce touch in basso a sinistra e destra
-- **Spara**: premi il pulsante centrale giallo
-- **Rigioca**: premi il pulsante "Rigioca" che appare a fine partita
-- Il cannone e le barriere sono sempre posizionati sopra i controlli touch
-- Il layout si adatta automaticamente a qualsiasi schermo
-
-## 🎯 Caratteristiche
-
-- 6 righe e 8 colonne di nemici, sempre centrati
-- Barriere colorate con resistenza crescente
-- 5 tipi diversi di nemici con sprite uniche
-- Effetti sonori per ogni azione
-- Sistema di punteggio
-- Livelli progressivi con **aumento di difficoltà lineare** (la velocità degli invasori cresce gradualmente)
-- Pulsante "Rigioca" per ripartire facilmente
-- Responsive e ottimizzato per smartphone
-
-## 🛠️ Tecnologie Utilizzate
-
-- p5.js per la grafica
-- Web Audio API per gli effetti sonori
-- HTML5 e CSS3 per l'interfaccia mobile
-- JavaScript per la logica di gioco
-
-## 📱 Compatibilità
-
-Il gioco è ottimizzato per:
-- Smartphone (iOS e Android)
-- Tablet
-
-## 🎨 Personalizzazione
-
-Puoi modificare:
-- Colori delle barriere
-- Velocità dei nemici
-- Dimensione dello schermo
-- Effetti sonori
-
-## 📝 Licenza
-
-Questo progetto è rilasciato sotto licenza CC0-1.0 - vedi il file [LICENSE](LICENSE) per i dettagli.
-
-## 🤝 Contribuire
-
-1. Fai il fork del progetto
-2. Crea un branch per la tua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit delle tue modifiche (`git commit -m 'Add some AmazingFeature'`)
-4. Push sul branch (`git push origin feature/AmazingFeature`)
-5. Apri una Pull Request
-
-## 📧 Contatti
-
-Per domande o suggerimenti, contattami su GitHub! 
+**Provalo ora:** apri la demo, aggiungi un corpo vicino alla Terra e guarda cosa succede all'orbita.
